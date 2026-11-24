@@ -139,6 +139,10 @@
   #show-qr .code { width: clamp(90px, 16vmin, 220px); }
   #show-qr .code svg { display: block; width: 100%; height: auto; }
   #show-qr span { display: block; margin-top: .8vmin; }
+  #show-caption { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; color: #fff;
+    padding: 6vmin 20vw 2.4vmin; font-weight: 800; letter-spacing: .02em; line-height: 1.15;
+    font-size: clamp(1.6rem, 6vmin, 5rem); text-shadow: 0 2px 12px rgba(0, 0, 0, .8);
+    background: linear-gradient(to top, rgba(0, 0, 0, .75), rgba(0, 0, 0, 0)); pointer-events: none; }
   #show-new { position: absolute; left: 2vmin; top: 2vmin; background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: #fff; font-weight: 700; padding: 1vmin 2.2vmin; border-radius: 999px; font-size: clamp(1rem, 2.4vmin, 2rem);
     opacity: 0; transition: opacity .4s; }
@@ -223,6 +227,7 @@
     <h2>Waiting for the first photo&hellip;</h2>
     <p>Scan the code to share yours!</p>
   </div>
+  <div id="show-caption" hidden></div>
   <div id="show-new">New photo!</div>
   <div id="show-qr" hidden><div class="code" id="show-qr-code"></div><span>Scan to share<br>your photos</span></div>
 </div>
@@ -3003,6 +3008,10 @@ const BOOT = <?!= boot ?>;
   function startSlideshow() {
     document.body.classList.add('show-mode');
     slide.layers = [$('layer-a'), $('layer-b')];
+    if (BOOT.caption) {
+      $('show-caption').textContent = BOOT.caption;
+      $('show-caption').hidden = false;
+    }
     if (BOOT.shareUrl && typeof qrcode === 'function') {
       try {
         const qr = qrcode(0, 'M');

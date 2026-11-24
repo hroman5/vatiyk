@@ -79,6 +79,8 @@ https://script.google.com/macros/s/.../exec?show=1
 - Press **F11** for full screen (Cmd+Ctrl+F on a Mac). Click the page once, then press
   the **right arrow** to skip to the next photo.
 - Seconds per photo: `SLIDE_SECONDS` in `Code.gs`.
+- Banner across the bottom (for example "Happy Birthday Daisy!"): `SLIDESHOW_CAPTION`
+  in `Code.gs`. Leave it `''` for no banner.
 - Set the computer to never sleep while it is plugged in, and do a test run with the
   projector before the party. Guests never see this link, and it only reads photos.
 

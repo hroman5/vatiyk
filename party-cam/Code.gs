@@ -51,7 +51,11 @@ const CONFIG = {
   // Seconds each photo stays on screen, and whether to show a small
   // "scan to share" QR code in the corner.
   SLIDE_SECONDS: 6,
-  SLIDESHOW_QR: true
+  SLIDESHOW_QR: true,
+
+  // Optional banner shown across the bottom of the slideshow, e.g.
+  // 'Happy Birthday Daisy!'. Leave '' for no banner.
+  SLIDESHOW_CAPTION: ''
 };
 
 // How long the list of photos is cached on the server. All guests share one
@@ -128,7 +132,8 @@ function doGet(e) {
     maxBytes: CONFIG.MAX_UPLOAD_BYTES,
     show: params.show === '1' || params.show === 'true',
     slideMs: Math.max(2, Number(CONFIG.SLIDE_SECONDS) || 6) * 1000,
-    shareUrl: CONFIG.SLIDESHOW_QR ? getShareUrl_() : ''
+    shareUrl: CONFIG.SLIDESHOW_QR ? getShareUrl_() : '',
+    caption: String(CONFIG.SLIDESHOW_CAPTION || '')
   };
 
   const template = HtmlService.createTemplateFromFile('Index');
