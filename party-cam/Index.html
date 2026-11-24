@@ -50,6 +50,13 @@
     color: #ffd0d0; padding: 12px 14px; border-radius: 12px; margin: 12px 0; }
   .hint { color: var(--muted); font-size: .9rem; text-align: center; margin: 8px 0 0; }
 
+  .tip { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 0; padding: 12px 12px 12px 14px;
+    background: var(--bg-2); border: 1px solid rgba(255, 255, 255, .1); border-radius: 12px; font-size: .9rem; }
+  .tip .tip-text { flex: 1; color: var(--muted); }
+  .tip strong { display: block; color: var(--text); margin-bottom: 2px; }
+  .tip button { background: none; border: 0; color: var(--muted); font-size: 1.5rem; line-height: 1;
+    padding: 0 4px; cursor: pointer; }
+
   .queue { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
   .queue li { display: flex; align-items: center; gap: 12px; background: var(--bg-2);
     border-radius: 12px; padding: 8px; }
@@ -140,6 +147,14 @@
     </div>
 
     <p class="hint">Photos go straight into the shared album. Everyone can see them in the Gallery tab.</p>
+    <div id="a2hs" class="tip" hidden>
+      <div class="tip-text">
+        <strong>Add Party Cam to your home screen</strong>
+        <span id="a2hs-steps"></span> Then you can open it again with one tap.
+      </div>
+      <button id="a2hs-close" aria-label="Dismiss tip">&times;</button>
+    </div>
+
     <ul id="queue" class="queue"></ul>
   </section>
 
@@ -544,6 +559,30 @@ const BOOT = <?!= boot ?>;
     touchX = null;
     if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
   }, { passive: true });
+
+  // ---------- "add to home screen" tip (phones only) ----------
+  (function () {
+    const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) ||
+        navigator.standalone === true;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem('partycam-tip-dismissed') === '1'; } catch (e) {}
+    if (standalone || dismissed) return;
+
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(ua);
+    if (!isIOS && !isAndroid) return;
+
+    $('a2hs-steps').textContent = isIOS
+        ? 'Tap the Share button, then "Add to Home Screen".'
+        : 'Tap the ⋮ menu, then "Add to Home screen".';
+    $('a2hs').hidden = false;
+    $('a2hs-close').addEventListener('click', () => {
+      $('a2hs').hidden = true;
+      try { localStorage.setItem('partycam-tip-dismissed', '1'); } catch (e) {}
+    });
+  })();
 
   // ---------- start ----------
   if (!HAS_SERVER) showError('This page must be opened from the Party Cam link.');
