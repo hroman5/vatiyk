@@ -12,7 +12,7 @@ It runs as a Google Apps Script web app under your Google account.
 | File | Purpose |
 | --- | --- |
 | `Code.gs` | Server code: saves photos to Drive and lists them for the gallery. **Settings are at the top.** |
-| `Index.html` | The guest page: camera, upload progress, live gallery, full-screen viewer. |
+| `Index.html` | The guest page: camera, upload progress, live gallery, full-screen viewer, and the projector slideshow (`?show=1`). |
 | `appsscript.json` | Project settings (permissions, "anyone can open"). Optional when pasting by hand. |
 | `qr.html` | Open in any browser to make a printable QR poster. Works offline. |
 
@@ -59,6 +59,28 @@ your Drive folder within a few seconds.
 ### 6. Make the QR poster
 Open `qr.html` in your browser, paste the Web app URL (and the event code if you
 set one), then **Print poster** or **Save QR as image**.
+
+## Projector slideshow
+
+Add `?show=1` to the end of your Web app link and open it on the computer that is
+connected to the projector:
+
+```
+https://script.google.com/macros/s/.../exec?show=1
+```
+
+(If you set an `ACCESS_CODE`, use `...exec?show=1&k=YOURCODE`.)
+
+- Photos fill the screen one at a time with a fade. New photos jump the queue and
+  show up within about 10-20 seconds, with a "New photo!" badge; after that they join
+  a shuffled loop of every photo.
+- A small "Scan to share your photos" QR code sits in the bottom-right corner
+  (`SLIDESHOW_QR` in `Code.gs`; press **Q** to hide or show it).
+- Press **F11** for full screen (Cmd+Ctrl+F on a Mac). Click the page once, then press
+  the **right arrow** to skip to the next photo.
+- Seconds per photo: `SLIDE_SECONDS` in `Code.gs`.
+- Set the computer to never sleep while it is plugged in, and do a test run with the
+  projector before the party. Guests never see this link, and it only reads photos.
 
 ## During and after the party
 

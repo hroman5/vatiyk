@@ -44,7 +44,14 @@ const CONFIG = {
   MAX_UPLOAD_BYTES: 8 * 1024 * 1024,
 
   // The gallery shows at most this many of the newest photos.
-  MAX_PHOTOS_SHOWN: 500
+  MAX_PHOTOS_SHOWN: 500,
+
+  // Projector slideshow: open your link with ?show=1 on the end, e.g.
+  //   https://script.google.com/macros/s/.../exec?show=1
+  // Seconds each photo stays on screen, and whether to show a small
+  // "scan to share" QR code in the corner.
+  SLIDE_SECONDS: 6,
+  SLIDESHOW_QR: true
 };
 
 // How long the list of photos is cached on the server. All guests share one
@@ -118,7 +125,10 @@ function doGet(e) {
     pollMs: Math.max(3, Number(CONFIG.POLL_SECONDS) || 10) * 1000,
     maxDim: CONFIG.MAX_DIMENSION,
     quality: CONFIG.JPEG_QUALITY,
-    maxBytes: CONFIG.MAX_UPLOAD_BYTES
+    maxBytes: CONFIG.MAX_UPLOAD_BYTES,
+    show: params.show === '1' || params.show === 'true',
+    slideMs: Math.max(2, Number(CONFIG.SLIDE_SECONDS) || 6) * 1000,
+    shareUrl: CONFIG.SLIDESHOW_QR ? getShareUrl_() : ''
   };
 
   const template = HtmlService.createTemplateFromFile('Index');
@@ -198,6 +208,20 @@ function checkCode_(code) {
   if (CONFIG.ACCESS_CODE && String(code || '') !== String(CONFIG.ACCESS_CODE)) {
     throw new Error('This link is missing its event code. Please scan the QR code again.');
   }
+}
+
+/** The guest link (with the event code, if any) shown as a QR in the slideshow. */
+function getShareUrl_() {
+  let url = '';
+  try {
+    url = ScriptApp.getService().getUrl() || '';
+  } catch (err) {
+    return '';
+  }
+  if (url && CONFIG.ACCESS_CODE) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + 'k=' + encodeURIComponent(CONFIG.ACCESS_CODE);
+  }
+  return url;
 }
 
 function getFolderId_() {
