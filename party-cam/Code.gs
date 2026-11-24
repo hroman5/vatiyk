@@ -55,7 +55,11 @@ const CONFIG = {
 
   // Optional banner shown across the bottom of the slideshow, e.g.
   // 'Happy Birthday Daisy!'. Leave '' for no banner.
-  SLIDESHOW_CAPTION: ''
+  SLIDESHOW_CAPTION: '',
+
+  // Order of the slideshow loop: 'newest' (newest photo first, then older ones,
+  // then start over) or 'shuffle'. New uploads always jump in right away.
+  SLIDESHOW_ORDER: 'newest'
 };
 
 // How long the list of photos is cached on the server. All guests share one
@@ -133,7 +137,8 @@ function doGet(e) {
     show: params.show === '1' || params.show === 'true',
     slideMs: Math.max(2, Number(CONFIG.SLIDE_SECONDS) || 6) * 1000,
     shareUrl: CONFIG.SLIDESHOW_QR ? getShareUrl_() : '',
-    caption: String(CONFIG.SLIDESHOW_CAPTION || '')
+    caption: String(CONFIG.SLIDESHOW_CAPTION || ''),
+    order: CONFIG.SLIDESHOW_ORDER === 'shuffle' ? 'shuffle' : 'newest'
   };
 
   const template = HtmlService.createTemplateFromFile('Index');

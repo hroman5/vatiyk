@@ -2940,7 +2940,8 @@ const BOOT = <?!= boot ?>;
     return a;
   }
 
-  // Next photo to show: brand-new photos first, then a shuffled loop of all of them.
+  // Next photo to show: brand-new photos first, then a loop of all of them
+  // (newest to oldest by default, or shuffled when BOOT.order is 'shuffle').
   function nextPick() {
     while (slide.queue.length) {
       const id = slide.queue.shift();
@@ -2948,10 +2949,15 @@ const BOOT = <?!= boot ?>;
     }
     for (let guard = 0; guard < 2; guard++) {
       if (!slide.deck.length) {
-        slide.deck = shuffle(photos.map((p) => p.id));
-        const n = slide.deck.length;
-        if (n > 1 && slide.deck[n - 1] === slide.last) {
-          const t = slide.deck[0]; slide.deck[0] = slide.deck[n - 1]; slide.deck[n - 1] = t;
+        const ids = photos.map((p) => p.id);            // newest first
+        if (BOOT.order === 'shuffle') {
+          slide.deck = shuffle(ids);
+          const n = slide.deck.length;
+          if (n > 1 && slide.deck[n - 1] === slide.last) {
+            const t = slide.deck[0]; slide.deck[0] = slide.deck[n - 1]; slide.deck[n - 1] = t;
+          }
+        } else {
+          slide.deck = ids.reverse();                   // pop() takes from the end: newest first
         }
       }
       while (slide.deck.length) {

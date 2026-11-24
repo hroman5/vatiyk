@@ -71,9 +71,10 @@ https://script.google.com/macros/s/.../exec?show=1
 
 (If you set an `ACCESS_CODE`, use `...exec?show=1&k=YOURCODE`.)
 
-- Photos fill the screen one at a time with a fade. New photos jump the queue and
-  show up within about 10-20 seconds, with a "New photo!" badge; after that they join
-  a shuffled loop of every photo.
+- Photos fill the screen one at a time with a fade. The loop starts with the newest
+  photo and works back to the oldest, then starts over. New photos jump the queue and
+  show up within about 10-20 seconds, with a "New photo!" badge. For a random order
+  instead, set `SLIDESHOW_ORDER: 'shuffle'` in `Code.gs`.
 - A small "Scan to share your photos" QR code sits in the bottom-right corner
   (`SLIDESHOW_QR` in `Code.gs`; press **Q** to hide or show it).
 - Press **F11** for full screen (Cmd+Ctrl+F on a Mac). Click the page once, then press
