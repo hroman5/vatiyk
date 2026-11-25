@@ -59,19 +59,7 @@ const CONFIG = {
 
   // Order of the slideshow loop: 'newest' (newest photo first, then older ones,
   // then start over) or 'shuffle'. New uploads always jump in right away.
-  SLIDESHOW_ORDER: 'newest',
-
-  // "70s TV" photo show: a retro console-TV slideshow of photos from ONE of your
-  // Drive folders (for example photos of the guest of honor through the years).
-  // Open your link with ?show=tv on the end:  https://script.google.com/macros/s/.../exec?show=tv
-  // TV_FOLDER_ID: the folder's ID (the last part of its address in Drive).
-  // The photos stay private: they are read with your account and sent only to the TV page.
-  TV_FOLDER_ID: '',
-  TV_TITLE: '',                          // big title card; '' uses EVENT_TITLE
-  TV_SUBTITLE: 'A Special Presentation', // smaller line under the title
-  TV_SECONDS: 7,                         // seconds each photo stays on screen
-  TV_ORDER: 'chronological',             // 'chronological' (by the date the photo was taken) or 'shuffle'
-  TV_SHOW_YEARS: false                   // true shows the year the photo was taken, when known
+  SLIDESHOW_ORDER: 'newest'
 };
 
 // How long the list of photos is cached on the server. All guests share one
@@ -150,13 +138,7 @@ function doGet(e) {
     slideMs: Math.max(2, Number(CONFIG.SLIDE_SECONDS) || 6) * 1000,
     shareUrl: CONFIG.SLIDESHOW_QR ? getShareUrl_() : '',
     caption: String(CONFIG.SLIDESHOW_CAPTION || ''),
-    order: CONFIG.SLIDESHOW_ORDER === 'shuffle' ? 'shuffle' : 'newest',
-    tv: params.show === 'tv',
-    tvTitle: String(CONFIG.TV_TITLE || CONFIG.EVENT_TITLE || ''),
-    tvSub: String(CONFIG.TV_SUBTITLE || ''),
-    tvMs: Math.max(3, Number(CONFIG.TV_SECONDS) || 7) * 1000,
-    tvOrder: CONFIG.TV_ORDER === 'shuffle' ? 'shuffle' : 'chronological',
-    tvYears: !!CONFIG.TV_SHOW_YEARS
+    order: CONFIG.SLIDESHOW_ORDER === 'shuffle' ? 'shuffle' : 'newest'
   };
 
   const template = HtmlService.createTemplateFromFile('Index');
@@ -226,110 +208,6 @@ function listPhotos(code, sinceMs) {
       ? index.filter(function (p) { return p.t > since; })
       : index.slice(0, CONFIG.MAX_PHOTOS_SHOWN);
   return {photos: photos, total: index.length};
-}
-
-/**
- * 70s TV show: the list of photos in TV_FOLDER_ID, in show order.
- * @return {Array<{id: string, y: number}>} y is the year taken, or 0 if unknown.
- */
-function tvList(code) {
-  checkCode_(code);
-  return getTvIndex_().map(function (p) { return {id: p.id, y: p.y}; });
-}
-
-/**
- * 70s TV show: one photo as a "data:" URL, sized for a projector (about 1600 px).
- * Read with this account's access, so the folder itself never has to be shared.
- */
-function tvPhoto(code, id) {
-  checkCode_(code);
-  const item = getTvIndex_().filter(function (p) { return p.id === id; })[0];
-  if (!item) {
-    throw new Error('Photo not found in the TV folder.');
-  }
-
-  const headers = {Authorization: 'Bearer ' + ScriptApp.getOAuthToken()};
-  const urls = [];
-  if (item.thumb) {
-    urls.push(item.thumb.replace(/=s\d+.*$/, '=s1600'));
-  }
-  urls.push('https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1600');
-
-  for (let i = 0; i < urls.length; i++) {
-    try {
-      const res = UrlFetchApp.fetch(urls[i], {headers: headers, muteHttpExceptions: true});
-      const type = String(res.getHeaders()['Content-Type'] || res.getHeaders()['content-type'] || '');
-      if (res.getResponseCode() === 200 && type.indexOf('image/') === 0) {
-        return 'data:' + type.split(';')[0] + ';base64,' + Utilities.base64Encode(res.getContent());
-      }
-    } catch (err) {
-      // Try the next source.
-    }
-  }
-
-  // Last resort: the original file, if it is a browser-friendly image of moderate size.
-  const file = DriveApp.getFileById(id);
-  const type = file.getMimeType();
-  if ((type === 'image/jpeg' || type === 'image/png') && file.getSize() < 6 * 1024 * 1024) {
-    return 'data:' + type + ';base64,' + Utilities.base64Encode(file.getBlob().getBytes());
-  }
-  throw new Error('Could not load that photo.');
-}
-
-/** Photos in TV_FOLDER_ID with their taken-time, oldest first. Cached for 5 minutes. */
-function getTvIndex_() {
-  if (!CONFIG.TV_FOLDER_ID) {
-    throw new Error('The TV show is not set up. Put the photo folder\'s ID in TV_FOLDER_ID in Code.gs.');
-  }
-  const cache = CacheService.getScriptCache();
-  const cached = cache.get('tvindex');
-  if (cached) {
-    return JSON.parse(cached);
-  }
-
-  const query = "'" + CONFIG.TV_FOLDER_ID + "' in parents and trashed = false and mimeType contains 'image/'";
-  let files = [];
-  let pageToken = '';
-  do {
-    const url = 'https://www.googleapis.com/drive/v3/files' +
-        '?q=' + encodeURIComponent(query) +
-        '&fields=' + encodeURIComponent('nextPageToken,files(id,name,thumbnailLink,imageMediaMetadata(time))') +
-        '&pageSize=1000' +
-        (pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : '');
-    const res = UrlFetchApp.fetch(url, {
-      headers: {Authorization: 'Bearer ' + ScriptApp.getOAuthToken()},
-      muteHttpExceptions: true
-    });
-    if (res.getResponseCode() !== 200) {
-      throw new Error('Could not read the TV photo folder (HTTP ' + res.getResponseCode() + ').');
-    }
-    const data = JSON.parse(res.getContentText());
-    files = files.concat(data.files || []);
-    pageToken = data.nextPageToken || '';
-  } while (pageToken);
-
-  const items = files.map(function (f) {
-    // EXIF time looks like "2013:07:04 22:07:27".
-    const m = /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/.exec(
-        (f.imageMediaMetadata && f.imageMediaMetadata.time) || '');
-    const t = m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : 0;
-    return {id: f.id, name: f.name || '', thumb: f.thumbnailLink || '', t: t,
-            y: t ? new Date(t).getUTCFullYear() : 0};
-  });
-  // Dated photos first (oldest to newest), then undated ones by file name.
-  items.sort(function (a, b) {
-    if (a.t && b.t) { return a.t - b.t; }
-    if (a.t) { return -1; }
-    if (b.t) { return 1; }
-    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
-  });
-
-  try {
-    cache.put('tvindex', JSON.stringify(items), 300);
-  } catch (err) {
-    // Too many photos for the cache; read Drive each time instead.
-  }
-  return items;
 }
 
 // ---------------------------------------------------------------------------
