@@ -85,6 +85,32 @@ https://script.google.com/macros/s/.../exec?show=1
 - Set the computer to never sleep while it is plugged in, and do a test run with the
   projector before the party. Guests never see this link, and it only reads photos.
 
+## 70s TV photo show
+
+A second slideshow, styled like a 1970s console TV, for photos in **one of your Drive
+folders** (for example photos of the guest of honor through the years). It opens with
+color bars ("Please stand by"), then a sunburst title card, then every photo with
+channel-change static between them, and "To be continued..." before it starts over.
+
+1. In `Code.gs`, set `TV_FOLDER_ID` to the folder's ID (the last part of its address in
+   Drive: `https://drive.google.com/drive/folders/`**`THIS_PART`**). Optional: `TV_TITLE`,
+   `TV_SUBTITLE`, `TV_SECONDS` (default 7), `TV_ORDER` and `TV_SHOW_YEARS`.
+2. Paste both `Code.gs` and `Index.html` into the script editor and deploy a **New version**.
+3. Open your Web app link with **`?show=tv`** on the end, for example `.../exec?show=tv`
+   (add `&k=YOURCODE` if you use an event code). Press **F11** for full screen.
+
+- **All photos are used,** including iPhone HEIC photos. Photos are shown oldest to newest
+  by the date the camera recorded; photos without a date come last, sorted by file name.
+  Set `TV_ORDER: 'shuffle'` for a random order.
+- **New photos added to the folder** appear the next time the show starts over.
+- **Years:** `TV_SHOW_YEARS: true` shows the year in the corner when the photo has a date.
+  Check a few first; some old cameras recorded the wrong date.
+- **Privacy:** the folder is not shared. The photos are read with your account and sent only
+  to this page. While the Web app is deployed, someone who has your link could in theory ask
+  for those photos through the page, so archive the deployment when the party is over.
+- Fonts: the title uses a retro Google font and falls back to a similar one when the
+  computer is offline.
+
 ## During and after the party
 
 - **Remove a photo:** delete it from the Drive folder. It disappears from guests'

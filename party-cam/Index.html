@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#14102b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap">
 <title>Party Cam</title>
 <style>
   :root {
@@ -147,6 +149,74 @@
     color: #fff; font-weight: 700; padding: 1vmin 2.2vmin; border-radius: 999px; font-size: clamp(1rem, 2.4vmin, 2rem);
     opacity: 0; transition: opacity .4s; }
   #show-new.on { opacity: 1; }
+
+  /* 70s TV photo show (?show=tv) */
+  #tvroom { display: none; position: fixed; inset: 0; z-index: 60; overflow: hidden; align-items: center; justify-content: center;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(255, 190, 110, .16), rgba(0, 0, 0, .55) 75%),
+      repeating-linear-gradient(90deg, #4b2f1b 0 9vh, #3d2514 9vh calc(9vh + .5vh), #54351f calc(9vh + .5vh) 18vh); }
+  body.tv-mode { padding: 0; background: #1b110a; overflow: hidden; cursor: none; }
+  body.tv-mode header, body.tv-mode main, body.tv-mode nav, body.tv-mode #lightbox,
+  body.tv-mode #toast, body.tv-mode #slideshow { display: none !important; }
+  body.tv-mode #tvroom { display: flex; }
+  .tv { position: relative; width: min(92vw, 128vh); padding-top: 11vh; padding-bottom: 3.5vh; }
+  .ears { position: absolute; left: 50%; top: 0; width: 0; height: 11vh; }
+  .ear { position: absolute; bottom: 0; width: .55vh; height: 10vh; background: linear-gradient(90deg, #eee, #8a8a8a); border-radius: .3vh;
+    transform-origin: 50% 100%; box-shadow: 0 0 .5vh rgba(0, 0, 0, .6); }
+  .ear.l { transform: rotate(-30deg); } .ear.r { transform: rotate(30deg); }
+  .earbase { position: absolute; left: -3.2vh; bottom: -.4vh; width: 6.4vh; height: 2.6vh; border-radius: 3.2vh 3.2vh 0 0; background: linear-gradient(#444, #1e1e1e); }
+  .cabinet { position: relative; aspect-ratio: 1.6; display: flex; gap: 2.2%; align-items: center; padding: 3.6% 3% 3.6% 3.4%;
+    border-radius: 2.4vh; box-shadow: 0 2.4vh 5vh rgba(0, 0, 0, .75), inset 0 0 0 .5vh #b98a3e, inset 0 0 0 1.1vh #4a2a10, inset 0 .6vh 1.6vh rgba(255, 220, 160, .25);
+    background:
+      repeating-linear-gradient(92deg, rgba(0, 0, 0, .10) 0 .25vh, rgba(0, 0, 0, 0) .25vh .9vh),
+      repeating-linear-gradient(88deg, rgba(255, 220, 160, .06) 0 .6vh, rgba(0, 0, 0, 0) .6vh 2.1vh),
+      linear-gradient(135deg, #94622f, #6c4421 38%, #82552a 62%, #5a3719); }
+  .bezel { flex: 0 0 68.5%; padding: 2.4%; border-radius: 5vh; background: linear-gradient(145deg, #2a221b, #0c0907);
+    box-shadow: inset 0 0 1.4vh #000, 0 0 0 .5vh #3a2410, 0 .4vh 1vh rgba(255, 230, 190, .22); }
+  .screen { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 4.4vh / 4vh; overflow: hidden; background: #000;
+    box-shadow: inset 0 0 5vh rgba(0, 0, 0, .95); }
+  .tvimg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .tvimg.blur { object-fit: cover; filter: blur(2.6vh) brightness(.55) saturate(1.2); transform: scale(1.15); opacity: 0; }
+  .tvimg.photo { object-fit: contain; opacity: 0; filter: sepia(.22) saturate(1.28) contrast(1.06) brightness(1.03); }
+  .tvimg.on { opacity: 1; }
+  .fx { position: absolute; inset: 0; pointer-events: none; }
+  .fx.scan { background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .20) 0 .22vh, rgba(0, 0, 0, 0) .22vh .55vh); mix-blend-mode: multiply; }
+  .fx.vig { background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, .55) 100%); }
+  .fx.glare { background: linear-gradient(115deg, rgba(255, 255, 255, .13) 0 18%, rgba(255, 255, 255, 0) 38%); }
+  .fx.flicker { background: rgba(255, 240, 210, .05); animation: tvflick 3.4s steps(1) infinite; }
+  @keyframes tvflick { 0% { opacity: 0; } 8% { opacity: 1; } 10% { opacity: 0; } 55% { opacity: 0; } 57% { opacity: .8; } 59% { opacity: 0; } }
+  #tv-static { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0; pointer-events: none; }
+  .chbug { position: absolute; right: 4.5%; bottom: 5%; font: 700 4.2vh/1 "Courier New", monospace; color: #7dff9c; letter-spacing: .15em;
+    text-shadow: 0 0 1vh #3aff6e; opacity: 0; transition: opacity .3s; }
+  .chbug.on { opacity: .85; }
+  .lower { position: absolute; left: 5%; bottom: 5.5%; padding: .4vh 1.6vh; font: 400 5.4vh/1.1 Shrikhand, Georgia, serif; color: #ffd24a;
+    text-shadow: .35vh .35vh 0 #5a2a08, -.2vh -.2vh 0 #5a2a08; transform: rotate(-3deg); }
+  .card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff4e0; }
+  .card[hidden] { display: none; }
+  .card.sunburst { background: radial-gradient(circle at 50% 58%, rgba(255, 244, 200, .55), rgba(0, 0, 0, 0) 55%),
+    repeating-conic-gradient(from 0deg at 50% 58%, #f0a400 0 6deg, #e0641c 6deg 12deg, #c24a14 12deg 18deg, #f6c133 18deg 24deg); }
+  .card h1 { margin: 0; max-width: 92%; font: 400 13.5vh/1.05 Shrikhand, "Chelsea Market", Georgia, serif; font-style: italic; color: #fff4e0;
+    text-shadow: .5vh .5vh 0 #7a3a10, 1vh 1vh 0 #3a1d08, 1.5vh 1.5vh .8vh rgba(0, 0, 0, .5); transform: rotate(-4deg); animation: tvzoom 1.1s ease-out both; }
+  .card .sub { margin-top: 3vh; font: 700 3.4vh/1.2 "Trebuchet MS", Arial, sans-serif; letter-spacing: .28em; text-transform: uppercase; color: #3a1d08;
+    background: #fff4e0; padding: .8vh 2.4vh; border-radius: .8vh; box-shadow: .4vh .4vh 0 #7a3a10; }
+  .card .small { margin-top: 2.2vh; font: italic 3.2vh Georgia, serif; color: #fff4e0; text-shadow: .25vh .25vh 0 #3a1d08; }
+  @keyframes tvzoom { from { transform: scale(.4) rotate(-12deg); opacity: 0; } to { transform: scale(1) rotate(-4deg); opacity: 1; } }
+  .card.bars { background: linear-gradient(#000, #000); justify-content: flex-start; }
+  .barsrow { flex: 0 0 70%; width: 100%; background: linear-gradient(90deg, #c8c8c8 0 14.28%, #c8c800 0 28.56%, #00c8c8 0 42.84%, #00c800 0 57.12%, #c800c8 0 71.4%, #c80000 0 85.68%, #0000c8 0); }
+  .barsmid { flex: 0 0 8%; width: 100%; background: linear-gradient(90deg, #0000c8 0 14.28%, #111 0 28.56%, #c800c8 0 42.84%, #111 0 57.12%, #00c8c8 0 71.4%, #111 0 85.68%, #c8c8c8 0); }
+  .barsbot { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(90deg, #08285a 0 20%, #fff 0 40%, #3a0a5a 0 60%, #111 0 100%); }
+  .barsbot span { font: 700 4.4vh/1 "Trebuchet MS", Arial, sans-serif; letter-spacing: .3em; color: #fff; background: rgba(0, 0, 0, .65); padding: .8vh 2vh; }
+  .panel { flex: 1; align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6% 4% 7%;
+    border-radius: 1.6vh; background: linear-gradient(160deg, #3b2412, #26160a); box-shadow: inset 0 0 1.4vh #000, 0 0 0 .3vh #b98a3e; }
+  .brand { font: 700 2vh/1 "Trebuchet MS", Arial, sans-serif; letter-spacing: .3em; color: #e7c46a; text-align: center; text-shadow: 0 .2vh 0 #000; }
+  .brand small { display: block; margin-top: .8vh; letter-spacing: .5em; font-size: 1.2vh; color: #b98a3e; }
+  .knob { position: relative; width: 11vh; height: 11vh; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f6e7c1, #b48a3c 45%, #5a3d12 100%); box-shadow: 0 .6vh 1.2vh rgba(0, 0, 0, .7), inset 0 0 0 .5vh #3b2610; }
+  .knob::after { content: ""; position: absolute; left: 50%; top: 7%; width: 7%; height: 32%; background: #2b1a0e; transform: translateX(-50%); border-radius: 1vh; }
+  .knob.a { transform: rotate(35deg); } .knob.b { width: 8vh; height: 8vh; transform: rotate(-60deg); }
+  .grille { width: 82%; height: 18vh; border-radius: 1vh; background: repeating-linear-gradient(0deg, #130c06 0 .6vh, #4a3420 .6vh 1.3vh); box-shadow: inset 0 0 1vh #000; }
+  .feet { display: flex; justify-content: space-between; padding: 0 9%; margin-top: -.2vh; }
+  .feet i { width: 7vh; height: 3.2vh; background: linear-gradient(#4a2a10, #2a170a); clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%); }
 </style>
 </head>
 <body>
@@ -219,6 +289,40 @@
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+
+<div id="tvroom" aria-hidden="true">
+  <div class="tv">
+    <div class="ears"><i class="ear l"></i><i class="ear r"></i><b class="earbase"></b></div>
+    <div class="cabinet">
+      <div class="bezel">
+        <div class="screen">
+          <img id="tv-bg" class="tvimg blur" alt="">
+          <img id="tv-img" class="tvimg photo" alt="">
+          <div id="tv-bars" class="card bars" hidden>
+            <div class="barsrow"></div><div class="barsmid"></div><div class="barsbot"><span>PLEASE STAND BY</span></div>
+          </div>
+          <div id="tv-title" class="card sunburst" hidden>
+            <h1 id="tv-title-text"></h1><div class="sub" id="tv-sub-text"></div><div class="small">in glorious color</div>
+          </div>
+          <div id="tv-end" class="card sunburst" hidden>
+            <h1 id="tv-end-text">To be continued&hellip;</h1><div class="small" id="tv-end-small"></div>
+          </div>
+          <div id="tv-year" class="lower" hidden></div>
+          <div id="tv-ch" class="chbug">CH 50</div>
+          <canvas id="tv-static" width="192" height="144"></canvas>
+          <div class="fx scan"></div><div class="fx flicker"></div><div class="fx vig"></div><div class="fx glare"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="brand">SUNBURST<small>COLOR TELEVISION</small></div>
+        <div class="knob a"></div>
+        <div class="knob b"></div>
+        <div class="grille"></div>
+      </div>
+    </div>
+    <div class="feet"><i></i><i></i></div>
+  </div>
+</div>
 
 <div id="slideshow" aria-live="off">
   <img id="layer-a" class="layer" alt="">
@@ -2541,6 +2645,7 @@ const BOOT = <?!= boot ?>;
   const $ = (id) => document.getElementById(id);
   const HAS_SERVER = !!(window.google && google.script && google.script.run);
   const SHOW = !!BOOT.show;
+  const TV = !!BOOT.tv;
   const slide = { queue: [], deck: [], last: null, front: 0, layers: [], timer: null, newTimer: null };
 
   $('title').textContent = BOOT.title;
@@ -3036,12 +3141,125 @@ const BOOT = <?!= boot ?>;
     showNext();
   }
 
+  // ---------- 70s TV photo show (?show=tv) ----------
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const TV_CARDS = ['tv-bars', 'tv-title', 'tv-end'];
+  const tvCache = new Map();   // photo id -> Promise of a data: URL (or null)
+  let tvPrevIds = [];
+
+  // Channel-change static. Resolves once the screen is fully covered; fades out on its own.
+  function staticBurst(ms) {
+    const c = $('tv-static'), g = c.getContext('2d'), im = g.createImageData(c.width, c.height);
+    c.style.transition = 'opacity .12s'; c.style.opacity = '1';
+    const iv = setInterval(() => {
+      const d = im.data;
+      for (let i = 0; i < d.length; i += 4) { const v = (Math.random() * 255) | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
+      g.putImageData(im, 0, 0);
+    }, 45);
+    setTimeout(() => { c.style.transition = 'opacity .3s'; c.style.opacity = '0'; setTimeout(() => clearInterval(iv), 340); }, ms);
+    return sleep(150);
+  }
+
+  function showCard(id) {
+    TV_CARDS.forEach((c) => { $(c).hidden = c !== id; });
+    $('tv-img').classList.remove('on'); $('tv-bg').classList.remove('on');
+    $('tv-year').hidden = true; $('tv-ch').classList.remove('on');
+  }
+  function showPhotoLayer(url, year) {
+    TV_CARDS.forEach((c) => { $(c).hidden = true; });
+    $('tv-bg').src = url; $('tv-img').src = url;
+    $('tv-img').classList.add('on'); $('tv-bg').classList.add('on');
+    const y = $('tv-year');
+    if (BOOT.tvYears && year) { y.textContent = year; y.hidden = false; } else { y.hidden = true; }
+    $('tv-ch').classList.add('on');
+  }
+
+  function tvFetch(item) {
+    if (!tvCache.has(item.id)) {
+      tvCache.set(item.id, server('tvPhoto', [BOOT.code, item.id]).catch(() => null));
+    }
+    return tvCache.get(item.id);
+  }
+  async function tvGetPhoto(item) {
+    let url = await tvFetch(item);
+    if (!url) { tvCache.delete(item.id); url = await tvFetch(item); }   // one retry
+    if (!url) tvCache.delete(item.id);
+    return url;
+  }
+  function tvForget(id) {          // keep memory small: only the photo on screen plus the next few
+    tvPrevIds.push(id);
+    while (tvPrevIds.length > 2) tvCache.delete(tvPrevIds.shift());
+  }
+
+  async function tvLoadList(previous) {
+    for (;;) {
+      try {
+        let list = await server('tvList', [BOOT.code]);
+        if (BOOT.tvOrder === 'shuffle') shuffle(list);
+        return list;
+      } catch (e) {
+        if (previous && previous.length) return previous;
+        showCard('tv-end');
+        $('tv-end-text').textContent = 'Technical difficulties';
+        $('tv-end-small').textContent = (e && e.message) || 'Please stand by.';
+        await sleep(5000);
+      }
+    }
+  }
+
+  async function startTv() {
+    document.body.classList.add('tv-mode');
+    $('tv-title-text').textContent = BOOT.tvTitle;
+    $('tv-sub-text').textContent = BOOT.tvSub;
+    $('tv-sub-text').hidden = !BOOT.tvSub;
+    document.title = BOOT.tvTitle || document.title;
+    keepAwake();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) keepAwake(); });
+
+    // Opening: color bars, then the title card, while the first photos load.
+    await staticBurst(450); showCard('tv-bars');
+    let list = await tvLoadList(null);
+    list.slice(0, 2).forEach(tvFetch);
+    await sleep(2600);
+    await staticBurst(500); showCard('tv-title');
+    await sleep(5200);
+
+    for (;;) {
+      if (!list.length) {
+        await staticBurst(500); showCard('tv-end');
+        $('tv-end-text').textContent = 'Coming soon';
+        $('tv-end-small').textContent = 'Add photos to the folder and they will appear here.';
+        await sleep(15000); list = await tvLoadList(list); continue;
+      }
+      for (let i = 0; i < list.length; i++) {
+        if (list[i + 1]) tvFetch(list[i + 1]);
+        if (list[i + 2]) tvFetch(list[i + 2]);
+        const url = await tvGetPhoto(list[i]);
+        if (!url) continue;                                   // skip a photo that will not load
+        await staticBurst(520);
+        showPhotoLayer(url, list[i].y);
+        tvForget(list[i].id);
+        await sleep(BOOT.tvMs);
+      }
+      await staticBurst(500); showCard('tv-end');
+      $('tv-end-text').textContent = 'To be continued…';
+      $('tv-end-small').textContent = 'Stay tuned!';
+      list = await tvLoadList(list);                          // pick up newly added photos
+      if (list[0]) tvFetch(list[0]);
+      await sleep(4200);
+    }
+  }
+
   // ---------- start ----------
-  if (!HAS_SERVER) showError('This page must be opened from the Party Cam link.');
-  poll(true).then(() => {
-    schedule();
-    if (SHOW) startSlideshow();
-  });
+  if (TV) {
+    startTv();
+  } else {
+    if (!HAS_SERVER) showError('This page must be opened from the Party Cam link.');
+    poll(true).then(() => {
+      schedule();
+      if (SHOW) startSlideshow();
+    });
+  }
 })();
 </script>
 </body>
